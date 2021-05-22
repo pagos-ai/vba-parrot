@@ -22,7 +22,8 @@ Function ParrotBINGet( _
             "/card/bank/url," & _
             "/card/bank/phone," & _
             "/card/bank/city", _
-            Optional ByVal useCache As Boolean = True) As String()
+            Optional ByVal useCache As Boolean = True, _
+            Optional ByVal useEnhanced As Boolean = False) As String()
     
     
     Static result_cache As New Dictionary
@@ -35,7 +36,7 @@ Function ParrotBINGet( _
     Request.ResponseFormat = WebFormat.Json
     Request.AddHeader "x-api-key", sApiKey
     Request.AddQuerystringParam "bin", sBIN
-    Request.AddQuerystringParam "enhanced", "false"
+    Request.AddQuerystringParam "enhanced", useEnhanced
     
     Dim Response As WebResponse
     
@@ -139,13 +140,7 @@ CONTINUE:
     End If
    
     'Debug.print "Number of paths " & UBound(pathArr)
-   
-    If UBound(pathArr) = 16 Then
-        ParrotBINGet = results
-    Else
-        ''Debug.print (paths)
-        ReDim results(UBound(pathArr))
-    End If
+    ReDim results(UBound(pathArr))
    
     Dim pt As Variant
     Dim cNode As Variant
