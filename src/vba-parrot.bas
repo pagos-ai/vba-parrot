@@ -58,7 +58,7 @@ Function ParrotBINGet( _
     End If
     
     If jsonText = "" Then
-        'Debug.Print sUrl, sBIN
+        Debug.Print sUrl, sBIN
         Set Response = Client.Execute(Request)
         jsonText = Response.Content
         
@@ -67,9 +67,9 @@ Function ParrotBINGet( _
         End If
         
         result_cache.Add keycheck, jsonText
-        'Debug.Print jsonText
+        Debug.Print jsonText
     Else
-        'Debug.print "CACHED", jsonText
+        Debug.Print "CACHED", jsonText
     End If
     Set JsonResponse = ParseJson(jsonText)
     
@@ -92,47 +92,13 @@ TOOMANY:
         errorCause = JsonResponse("errorCause")
     End If
     
-    
-    
-    If (errorCause = "not_found_error") Then
+    If (Not errorCause = "") Then
              ' don't cache not found
              'If (result_cache.Exists(keycheck)) Then
              '    result_cache.Remove (keycheck)
              'End If
              ReDim results(1)
              results(0) = errortext
-             ParrotBINGet = results
-             Exit Function
-    ElseIf (errortext = "BIN card number is not valid.") Then
-             ReDim results(1)
-             results(0) = "Not valid"
-             ParrotBINGet = results
-             Exit Function
-   ElseIf (errortext = "Requested object was not found : card was not found.") Then
-             If (result_cache.Exists(keycheck)) Then
-                 result_cache.Remove (keycheck)
-             End If
-             ReDim results(1)
-             results(0) = "Sorry, BIN is not found."
-             ParrotBINGet = results
-             Exit Function
-    ElseIf (errortext = "Unauthorized") Then
-             ReDim results(1)
-             results(0) = "Not authorized"
-             ParrotBINGet = results
-             Exit Function
-   ElseIf (errortext = "Trial period has expired.") Then
-             ReDim results(1)
-             results(0) = "Free Trial Expired"
-             ParrotBINGet = results
-             Exit Function
-    ElseIf (errortext = "Too many requests") Then
-                 ' don't cache too many requests
-             'If (result_cache.Exists(keycheck)) Then
-             '    result_cache.Remove (keycheck)
-             'End If
-             ReDim results(1)
-             results(0) = "Too many requests"
              ParrotBINGet = results
              Exit Function
     End If
