@@ -11,6 +11,8 @@ Function ParrotBINGet( _
             "/card/type," & _
             "/card/brand," & _
             "/card/prepaid," & _
+            "/card/product/product_id," & _
+            "/card/product/product_name," & _
             "/card/country/numeric," & _
             "/card/country/alpha2," & _
             "/card/country/name," & _
@@ -56,7 +58,7 @@ Function ParrotBINGet( _
     End If
     
     If jsonText = "" Then
-        'Debug.print sUrl, sBIN
+        'Debug.Print sUrl, sBIN
         Set Response = Client.Execute(Request)
         jsonText = Response.Content
         
@@ -65,38 +67,40 @@ Function ParrotBINGet( _
         End If
         
         result_cache.Add keycheck, jsonText
-        'Debug.print jsonText
+        'Debug.Print jsonText
     Else
-        ''Debug.print "CACHED", jsonText
+        'Debug.print "CACHED", jsonText
     End If
     Set JsonResponse = ParseJson(jsonText)
     
-    ''Debug.print JsonResponse("card")("length")
+    'Debug.print JsonResponse("card")("length")
     
     
     
    Dim errortext As String
+   Dim errorCause As String
    
 BINNOTFOUND:
    On Error GoTo TOOMANY
-   errortext = JsonResponse("result")("info")
+   errortext = JsonResponse("card")("network")
 TOOMANY:
     On Error GoTo -1
     
     On Error GoTo CONTINUE
     If (errortext = "") Then
         errortext = JsonResponse("message")
+        errorCause = JsonResponse("errorCause")
     End If
     
     
     
-    If (errortext = "Bin Card does not exist in our database!") Then
+    If (errorCause = "not_found_error") Then
              ' don't cache not found
              'If (result_cache.Exists(keycheck)) Then
              '    result_cache.Remove (keycheck)
              'End If
              ReDim results(1)
-             results(0) = "Sorry, BIN is not found."
+             results(0) = errortext
              ParrotBINGet = results
              Exit Function
     ElseIf (errortext = "BIN card number is not valid.") Then
